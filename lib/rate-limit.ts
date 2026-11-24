@@ -6,13 +6,13 @@ const MAX_BUCKETS = 10_000;
 const buckets = new Map<string, { attempts: number; expiresAt: number }>();
 let lastCleanup = 0;
 
-export async function rateLimit(req: Request, scope: "login" | "rsvp") {
+export async function rateLimit(req: Request) {
   // Only trust a client-IP header explicitly configured for an overwriting proxy.
   const header = process.env.RATE_LIMIT_IP_HEADER;
   const clientIp = header ? req.headers.get(header)?.split(",")[0].trim() : undefined;
-  const key = createHmac("sha256", process.env.SUPABASE_SERVICE_ROLE_KEY || "")
-    .update(`${scope}:${clientIp || "shared"}`).digest("hex");
-  const limit = scope === "login" ? (clientIp ? 10 : 30) : (clientIp ? 20 : 120);
+  const key = createHmac("sha256", process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD || "")
+    .update(`login:${clientIp || "shared"}`).digest("hex");
+  const limit = clientIp ? 10 : 30;
   const now = Date.now();
   // Best-effort protection per server instance, without a database dependency.
   if (now - lastCleanup >= 60_000 || buckets.size >= MAX_BUCKETS) {

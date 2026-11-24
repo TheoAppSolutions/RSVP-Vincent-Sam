@@ -3,14 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Modal from "@/components/shared/Modal";
 import { csvCell } from "@/lib/csv";
-
-type Rsvp = {
-  id: string;
-  name: string;
-  message: string | null;
-  attending: boolean;
-  created_at: string;
-};
+import type { Rsvp } from "@/lib/rsvps";
 
 type AttendanceFilter = "all" | "yes" | "no";
 type DateFilter = "all" | "today" | "7days" | "30days";
@@ -28,14 +21,6 @@ function SearchIcon() {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5" aria-hidden>
       <circle cx="11" cy="11" r="7" />
       <path d="m20 20-4-4" />
-    </svg>
-  );
-}
-
-function TrashIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4" aria-hidden>
-      <path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5" />
     </svg>
   );
 }
@@ -59,8 +44,6 @@ export default function Admin() {
   const [dateFilter, setDateFilter] = useState<DateFilter>("all");
   const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
   const [selectedRsvp, setSelectedRsvp] = useState<Rsvp | null>(null);
-  const [pendingDelete, setPendingDelete] = useState<Rsvp | null>(null);
-  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     // Remove credentials saved by older versions; authentication now uses an HttpOnly cookie.
@@ -72,7 +55,6 @@ export default function Admin() {
     setRows(null);
     setPassword("");
     setSelectedRsvp(null);
-    setPendingDelete(null);
   }
 
   async function load(silent = false) {
@@ -114,41 +96,6 @@ export default function Admin() {
     } catch {
       setError("Couldn’t connect. Check your internet connection and try again.");
     } finally { setLoading(false); }
-  }
-
-  async function signOut() {
-    setLoading(true);
-    setError("");
-    try {
-      const response = await fetch("/api/admin/session", { method: "DELETE" });
-      if (!response.ok) throw new Error("Sign out failed");
-      clearSession();
-    } catch { setError("Couldn’t sign out. Please try again."); }
-    finally { setLoading(false); }
-  }
-
-  async function deleteRsvp() {
-    if (!pendingDelete || deleting) return;
-    const id = pendingDelete.id;
-    setDeleting(true);
-    setError("");
-    try {
-      const response = await fetch("/api/admin/rsvps", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
-      if (response.status === 401) {
-        clearSession();
-        setError("Your session has expired. Please sign in again.");
-        return;
-      }
-      if (!response.ok) throw new Error("Delete failed");
-      setRows((current) => current?.filter((row) => row.id !== id) ?? null);
-      setPendingDelete(null);
-    } catch {
-      setError("Couldn’t delete that response. Please try again.");
-    } finally { setDeleting(false); }
   }
 
   const filteredRows = useMemo(() => {
@@ -203,7 +150,7 @@ export default function Admin() {
           <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-full bg-dusty-700 font-serif text-xl italic text-white">RSVP</div>
           <p className="text-[10px] uppercase tracking-[0.35em] text-dusty-500">Private dashboard</p>
           <h1 className="mt-2 font-serif text-4xl font-medium text-dusty-900">Welcome back</h1>
-          <p className="mt-3 text-sm leading-6 text-dusty-600">Sign in to manage your guest responses.</p>
+          <p className="mt-3 text-sm leading-6 text-dusty-600">Sign in to view your saved guest responses.</p>
           <label htmlFor="admin-password" className="mt-7 block text-[10px] uppercase tracking-[0.25em] text-dusty-600">Admin password</label>
           <input id="admin-password" type="password" maxLength={512} autoComplete="current-password" required value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your password" className="mt-2 w-full rounded-xl border border-dusty-200 bg-dusty-50/60 px-4 py-3.5 text-sm outline-none transition placeholder:text-dusty-400 focus:border-dusty-500 focus:ring-4 focus:ring-dusty-200/60" />
           {error && <p className="mt-3 text-sm text-red-700" role="alert">{error}</p>}
@@ -228,16 +175,14 @@ export default function Admin() {
             <h1 className="mt-1 font-serif text-3xl font-medium text-dusty-900 sm:text-4xl">Guest responses</h1>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => load()} disabled={loading || deleting} className="rounded-full border border-dusty-300 bg-white px-4 py-2.5 text-xs font-medium text-dusty-700 transition hover:border-dusty-500 hover:bg-dusty-50 disabled:opacity-50">{loading ? "Refreshing…" : "Refresh"}</button>
-            <button onClick={signOut} disabled={loading || deleting} className="rounded-full border border-dusty-300 bg-white px-4 py-2.5 text-xs font-medium text-dusty-700 transition hover:bg-dusty-50 disabled:opacity-50">Sign out</button>
+            <a href="/" className="rounded-full border border-dusty-300 bg-white px-4 py-2.5 text-xs font-medium text-dusty-700 transition hover:bg-dusty-50">View invitation</a>
             <button onClick={exportCsv} disabled={!filteredRows.length} className="rounded-full bg-dusty-800 px-4 py-2.5 text-xs font-medium text-white transition hover:bg-dusty-900 disabled:cursor-not-allowed disabled:opacity-40">Export CSV</button>
           </div>
         </div>
       </header>
 
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-        {error && <div className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert"><span>{error}</span><button onClick={() => setError("")} className="font-medium">Dismiss</button></div>}
-
+        {error && <p className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">{error}</p>}
         <section className="grid gap-3 sm:grid-cols-3" aria-label="RSVP summary">
           {[
             { label: "Total responses", value: rows.length, detail: "All submissions" },
@@ -281,7 +226,7 @@ export default function Admin() {
         <section className="mt-4 overflow-hidden rounded-2xl border border-dusty-200/70 bg-white shadow-[0_8px_30px_rgba(54,75,93,0.05)]" aria-label="RSVP responses">
           <div className="hidden overflow-x-auto md:block">
             <table className="w-full table-fixed text-left text-sm">
-              <thead className="border-b border-dusty-200 bg-dusty-50/80 text-[10px] uppercase tracking-[0.18em] text-dusty-500"><tr><th className="w-[23%] px-5 py-4 font-medium">Guest</th><th className="w-[16%] px-5 py-4 font-medium">Response</th><th className="px-5 py-4 font-medium">Message</th><th className="w-[19%] px-5 py-4 font-medium">Submitted</th><th className="w-16 px-3 py-4"><span className="sr-only">Actions</span></th></tr></thead>
+              <thead className="border-b border-dusty-200 bg-dusty-50/80 text-[10px] uppercase tracking-[0.18em] text-dusty-500"><tr><th className="w-[23%] px-5 py-4 font-medium">Guest</th><th className="w-[16%] px-5 py-4 font-medium">Response</th><th className="px-5 py-4 font-medium">Message</th><th className="w-[19%] px-5 py-4 font-medium">Submitted</th></tr></thead>
               <tbody className="divide-y divide-dusty-100">
                 {filteredRows.map((row) => (
                   <tr
@@ -300,8 +245,7 @@ export default function Admin() {
                     <td className="px-5 py-4 font-medium text-dusty-900">{row.name}</td>
                     <td className="px-5 py-4"><StatusBadge attending={row.attending} /></td>
                     <td className="px-5 py-4 leading-6 text-dusty-600"><p className="line-clamp-2">{row.message || <span className="italic text-dusty-400">No message</span>}</p></td>
-                    <td className="px-5 py-4 text-xs leading-5 text-dusty-500"><time dateTime={row.created_at}>{new Date(row.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}<br />{new Date(row.created_at).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}</time></td>
-                    <td className="px-3 py-4"><button onClick={(event) => { event.stopPropagation(); setPendingDelete(row); }} onKeyDown={(event) => event.stopPropagation()} className="rounded-lg p-2 text-dusty-400 opacity-70 transition hover:bg-red-50 hover:text-red-700 focus:opacity-100 group-hover:opacity-100" aria-label={`Delete response from ${row.name}`}><TrashIcon /></button></td>
+                    <td className="px-5 py-4 text-xs leading-5 text-dusty-500"><time dateTime={row.created_at}>{new Date(row.created_at).toLocaleDateString("en-PH", { timeZone: "Asia/Manila", month: "short", day: "numeric", year: "numeric" })}<br />{new Date(row.created_at).toLocaleTimeString("en-PH", { timeZone: "Asia/Manila", hour: "numeric", minute: "2-digit" })}</time></td>
                   </tr>
                 ))}
               </tbody>
@@ -310,13 +254,13 @@ export default function Admin() {
           <div className="divide-y divide-dusty-100 md:hidden">
             {filteredRows.map((row) => (
               <article key={row.id} tabIndex={0} role="button" onClick={() => setSelectedRsvp(row)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setSelectedRsvp(row); } }} className="cursor-pointer p-5 transition hover:bg-dusty-50/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-dusty-500" aria-label={`View full response from ${row.name}`}>
-                <div className="flex items-start justify-between gap-4"><div><h2 className="font-medium text-dusty-900">{row.name}</h2><div className="mt-2"><StatusBadge attending={row.attending} /></div></div><button onClick={(event) => { event.stopPropagation(); setPendingDelete(row); }} onKeyDown={(event) => event.stopPropagation()} className="rounded-lg p-2 text-dusty-400 hover:bg-red-50 hover:text-red-700" aria-label={`Delete response from ${row.name}`}><TrashIcon /></button></div>
+                <div className="flex items-start justify-between gap-4"><div><h2 className="font-medium text-dusty-900">{row.name}</h2><div className="mt-2"><StatusBadge attending={row.attending} /></div></div></div>
                 {row.message && <p className="mt-4 line-clamp-3 text-sm leading-6 text-dusty-600">{row.message}</p>}
-                <time dateTime={row.created_at} className="mt-4 block text-[11px] uppercase tracking-[0.12em] text-dusty-400">{new Date(row.created_at).toLocaleString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })}</time>
+                <time dateTime={row.created_at} className="mt-4 block text-[11px] uppercase tracking-[0.12em] text-dusty-400">{new Date(row.created_at).toLocaleString("en-PH", { timeZone: "Asia/Manila", month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })}</time>
               </article>
             ))}
           </div>
-          {!filteredRows.length && <div className="px-6 py-16 text-center"><div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-dusty-100 text-dusty-500"><SearchIcon /></div><h2 className="mt-4 font-serif text-2xl text-dusty-800">No responses found</h2><p className="mt-2 text-sm text-dusty-500">{hasFilters ? "Try adjusting or clearing your filters." : "New guest responses will appear here."}</p></div>}
+          {!filteredRows.length && <div className="px-6 py-16 text-center"><div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-dusty-100 text-dusty-500"><SearchIcon /></div><h2 className="mt-4 font-serif text-2xl text-dusty-800">No responses found</h2><p className="mt-2 text-sm text-dusty-500">{hasFilters ? "Try adjusting or clearing your filters." : "There are no saved responses to display."}</p></div>}
         </section>
       </div>
 
@@ -328,7 +272,7 @@ export default function Admin() {
             <h2 id="message-title" className="mt-2 pr-12 font-serif text-3xl font-medium text-dusty-900">{selectedRsvp.name}</h2>
             <div className="mt-3 flex flex-wrap items-center gap-3">
               <StatusBadge attending={selectedRsvp.attending} />
-              <time dateTime={selectedRsvp.created_at} className="text-xs text-dusty-400">{new Date(selectedRsvp.created_at).toLocaleString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })}</time>
+              <time dateTime={selectedRsvp.created_at} className="text-xs text-dusty-400">{new Date(selectedRsvp.created_at).toLocaleString("en-PH", { timeZone: "Asia/Manila", month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })}</time>
             </div>
             <div className="my-6 h-px bg-dusty-100" />
             <p id="message-content" className={`whitespace-pre-wrap break-words text-sm leading-7 ${selectedRsvp.message ? "text-dusty-700" : "italic text-dusty-400"}`}>{selectedRsvp.message || "No message was included with this response."}</p>
@@ -336,16 +280,6 @@ export default function Admin() {
         </div></Modal>
       )}
 
-      {pendingDelete && (
-        <Modal alert labelledBy="delete-title" describedBy="delete-description" dismissible={!deleting} onClose={() => setPendingDelete(null)}><div className="fixed inset-0 z-50 flex items-center justify-center bg-dusty-950/45 p-5 backdrop-blur-sm" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !deleting) setPendingDelete(null); }}>
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl sm:p-7">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-red-50 text-red-700"><TrashIcon /></div>
-            <h2 id="delete-title" className="mt-5 font-serif text-3xl font-medium text-dusty-900">Delete this response?</h2>
-            <p id="delete-description" className="mt-3 text-sm leading-6 text-dusty-600">The RSVP from <strong className="font-medium text-dusty-900">{pendingDelete.name}</strong> will be permanently removed. This action can’t be undone.</p>
-            <div className="mt-7 flex justify-end gap-3"><button onClick={() => setPendingDelete(null)} disabled={deleting} className="rounded-xl border border-dusty-300 px-4 py-2.5 text-sm font-medium text-dusty-700 hover:bg-dusty-50 disabled:opacity-50">Cancel</button><button onClick={deleteRsvp} disabled={deleting} className="rounded-xl bg-red-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-800 disabled:cursor-wait disabled:opacity-60">{deleting ? "Deleting…" : "Delete response"}</button></div>
-          </div>
-        </div></Modal>
-      )}
     </main>
   );
 }

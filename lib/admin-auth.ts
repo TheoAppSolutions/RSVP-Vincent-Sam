@@ -8,7 +8,7 @@ export const adminCookieOptions = {
 
 function sessionKey() {
   const password = process.env.ADMIN_PASSWORD;
-  const secret = process.env.ADMIN_SESSION_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const secret = process.env.ADMIN_SESSION_SECRET || password;
   if (!password || password === "change-me" || !secret) return null;
   return createHmac("sha256", secret).update(`admin-session:${password}`).digest();
 }

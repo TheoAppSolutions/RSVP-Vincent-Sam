@@ -1,34 +1,34 @@
-# Wedding RSVP
+# Wedding invitation and guest responses
 
-The root page displays the wedding invitation and RSVP form. The admin dashboard is available at `/admin`.
+The invitation is available at `/`. Its dashboard button opens `/admin/`, where signed-in admins can browse the saved responses, search names and messages, filter attendance and submission dates, sort results, view full messages, and export the current results as CSV.
 
-## Run locally
+Guest records come from a local file and remain read-only. Admin authentication runs on the Next.js server using `ADMIN_PASSWORD` from `.env.local` or `.env`. No database is required. Records are returned only through an authenticated API and are excluded from the public browser bundle.
 
-1. Run `npm install`.
-2. Copy `.env.example` to `.env.local` and set the Supabase URL, service role key, and a strong, unique admin password. The placeholder `change-me` is rejected.
-3. For a new database, run `supabase/schema.sql` in the Supabase SQL editor. Existing databases with `public.vincent_krystel` need no migration.
-4. Run `npm run dev`.
+## Local development
 
-Open `/` for the invitation and `/admin` for guest responses. The RSVP form writes to the Supabase table `public.vincent_krystel`. The dashboard can filter, export, and delete responses.
+1. Run `npm ci`.
+2. Copy `.env.example` to `.env.local` and set `ADMIN_PASSWORD` to your admin password. Keep an existing `.env` or `.env.local` password if already configured.
+3. Run `npm run dev`.
+4. Open `http://localhost:3000`.
 
-## Updating an existing deployment
+## Response data
 
-No database migration is required for the existing `public.vincent_krystel` table. The app uses only `id`, `name`, `message`, `attending`, and `created_at`; the database generates `id` and `created_at`. Keep the database row limit at least 500 (the admin fetches pages of 500).
+Saved responses live in `lib/rsvps.ts`, including each guest’s name, attendance, message, and submission timestamp. Displayed timestamps use the Asia/Manila timezone; CSV exports retain the original timestamp values.
 
-Admin login now creates an eight-hour, HttpOnly, SameSite=Strict cookie. Production cookies are Secure and require HTTPS. Sign out clears the cookie; rotating `ADMIN_PASSWORD` or the signing secret invalidates all existing sessions. `ADMIN_SESSION_SECRET` can be a dedicated random secret (generate with `openssl rand -hex 32`); otherwise the server-only Supabase service role key is used. Passwords previously saved in browser session storage are removed on the next admin visit. The old `x-admin-password` API header is no longer accepted.
+To change the records, edit `lib/rsvps.ts` and rebuild. No browser action changes the saved snapshot.
 
-Login and RSVP requests use an in-memory rate limiter with no additional database tables or functions. If your reverse proxy overwrites a header with the real client IP, set `RATE_LIMIT_IP_HEADER` to that header's name. Do not trust a visitor-controlled forwarding header. With a trusted client IP, the limits are 10 login attempts and 20 RSVP submissions per 15 minutes per IP. Without it, the limits are shared: 30 login attempts and 120 RSVP submissions per 15 minutes. Limits apply per server instance and reset when it restarts; they are best-effort on serverless hosting and are not shared across Vercel instances.
+## Authentication
 
-Each successful RSVP submission inserts a new response. The form prevents simultaneous double-click submissions, but retries after an uncertain network failure or submissions after a reload can create additional rows. Names alone do not identify a guest, so the app does not overwrite an earlier response by name.
+The admin password is checked on the server. Successful login creates an eight-hour HttpOnly, SameSite=Strict session cookie; production cookies require HTTPS. Changing `ADMIN_PASSWORD` invalidates existing sessions. You can optionally set `ADMIN_SESSION_SECRET` as a separate signing secret; the password alone is sufficient when it is omitted. Empty passwords and the placeholder `change-me` are rejected.
 
-The invitation components live in `components/template-3`. Shared event settings live in `lib/event.ts`, and shared media lives in `public`. Update the single `dateISO` in `lib/event.ts` to change the wedding date/time; all date labels use the Asia/Manila timezone. The RSVP submission hook and the modal used by the invitation and admin dashboard live in `components/shared`.
+Login attempts are rate limited per server instance. Set `RATE_LIMIT_IP_HEADER` only when your trusted reverse proxy overwrites that header with the real client IP. Without it, all visitors share a limit of 30 attempts per 15 minutes; with it, each IP has 10 attempts per 15 minutes.
 
-For maps, set `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` and enable Google's Maps Embed API. Set the same environment variables when deploying.
+## Build and host
 
-## Validation
+Run `npm test`, `npm run typecheck`, and `npm run build`. Start the production server with `npm start`, or deploy to a host that supports Next.js server routes. Set the same environment variables on the deployment host and use HTTPS in production.
 
-- `npm test` runs security/API regression checks with a mocked Supabase client using Node's built-in test runner and the existing TypeScript compiler. It does not contact a live database.
-- `npm run build` produces the production build and regenerates Next.js route types.
-- `npm run typecheck` checks TypeScript. After removing routes, build first to refresh stale `.next/types` files.
+## Content and accessibility
 
-The gallery and admin dialogs use native `<dialog>` elements for modal focus management and keyboard dismissal. CSV exports escape quotes and neutralize formula-leading guest text.
+Invitation components live in `components/template-3`. Shared event settings live in `lib/event.ts`, and media lives in `public`. Update `dateISO` in `lib/event.ts` to change the wedding date/time.
+
+The gallery and guest-message dialogs use native `<dialog>` elements for focus management and keyboard dismissal. CSV exports escape quotes and neutralize formula-leading guest text.

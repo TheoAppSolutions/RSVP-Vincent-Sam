@@ -14,7 +14,6 @@ export const EVENT = {
   dateLabel: formatDate({ month: "long", day: "numeric", year: "numeric" }),
   time: formatDate({ hour: "numeric", minute: "2-digit", hour12: true }),
   dateISO,
-  rsvpDeadline: "January 5, 2027",
   dressCode: "Semi-formal",
   venue: { name: "Pacific Point", address: "Tacloban City, Leyte" },
 };

@@ -43,7 +43,7 @@ export function json(body: unknown, status = 200, headers?: HeadersInit) {
 
 export function errorResponse(error: unknown) {
   if (error instanceof HttpError) return json({ error: error.message }, error.status);
-  console.error("Request failed", error instanceof Error ? error.message : "Database error");
+  console.error("Request failed", error instanceof Error ? error.message : "Unknown error");
   return json({ error: "Server error" }, 500);
 }
 

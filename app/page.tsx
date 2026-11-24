@@ -5,7 +5,6 @@ import Attire from "@/components/template-3/Attire";
 import Gift from "@/components/template-3/Gift";
 import GoodToKnow from "@/components/template-3/GoodToKnow";
 import Gallery from "@/components/template-3/Gallery";
-import RsvpForm from "@/components/template-3/RsvpForm";
 import DesignShell from "@/components/template-3/MusicPlayer";
 import { EVENT } from "@/lib/event";
 
@@ -25,10 +24,10 @@ export default function Home() {
             <div className="rsvp-intro">
               <span className="eyebrow light">The celebration is better with you</span>
               <h2 id="rsvp-title" className="display-heading">The pleasure of your <em>company</em></h2>
-              <p>We would be honored to celebrate this day with you. Kindly reply by {EVENT.rsvpDeadline}.</p>
+              <p>Thank you for your warm wishes. View the guest responses and messages shared for our celebration.</p>
               <div className="rsvp-monogram" aria-hidden="true">{EVENT.initials}</div>
             </div>
-            <RsvpForm />
+            <a href="/admin/" className="dashboard-button">View admin dashboard <span aria-hidden="true">↗</span></a>
           </div>
         </section>
         <footer className="site-footer">

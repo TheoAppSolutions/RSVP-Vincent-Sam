@@ -41,7 +41,7 @@ export default function Hero() {
           <a href="#gallery" tabIndex={entered ? 0 : -1}>Our story</a>
           <a href="#details" tabIndex={entered ? 0 : -1}>Details</a>
         </div>
-        <button type="button" onClick={goToRsvp} className="nav-rsvp">RSVP <span aria-hidden="true">↗</span></button>
+        <button type="button" onClick={goToRsvp} className="nav-rsvp">Responses <span aria-hidden="true">↗</span></button>
       </nav>
 
       <div className="hero-content">
@@ -59,7 +59,7 @@ export default function Hero() {
               <span>{EVENT.dateLong}</span>
               <span>{EVENT.time} · {EVENT.venue.name}, {EVENT.venue.address}</span>
             </div>
-            <button type="button" onClick={goToRsvp} className="primary-link">Kindly RSVP <span aria-hidden="true">↗</span></button>
+            <button type="button" onClick={goToRsvp} className="primary-link">View guest responses <span aria-hidden="true">↗</span></button>
           </div>
         </div>
       </div>

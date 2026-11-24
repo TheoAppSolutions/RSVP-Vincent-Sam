@@ -8,11 +8,9 @@ type Props = {
   label?: string;
   labelledBy?: string;
   describedBy?: string;
-  alert?: boolean;
-  dismissible?: boolean;
 };
 
-export default function Modal({ children, onClose, label, labelledBy, describedBy, alert = false, dismissible = true }: Props) {
+export default function Modal({ children, onClose, label, labelledBy, describedBy }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -29,7 +27,7 @@ export default function Modal({ children, onClose, label, labelledBy, describedB
     };
   }, []);
 
-  return <dialog ref={ref} className="modal-root" role={alert ? "alertdialog" : "dialog"} aria-modal="true"
+  return <dialog ref={ref} className="modal-root" role="dialog" aria-modal="true"
     aria-label={label} aria-labelledby={labelledBy} aria-describedby={describedBy}
     onKeyDown={(event) => {
       if (event.key !== "Tab") return;
@@ -45,7 +43,7 @@ export default function Modal({ children, onClose, label, labelledBy, describedB
         event.preventDefault(); first.focus();
       }
     }}
-    onCancel={(event) => { event.preventDefault(); if (dismissible) onClose(); }}>
+    onCancel={(event) => { event.preventDefault(); onClose(); }}>
     {children}
   </dialog>;
 }
