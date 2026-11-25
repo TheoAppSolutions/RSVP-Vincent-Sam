@@ -190,7 +190,7 @@ html { scroll-behavior: smooth; }
 }
 @media (max-width: 800px) {
   .wedding-site .hero { min-height: 0; }
-  .wedding-site .hero-image { top: -60px !important; height: calc(100% + 80px) !important; object-position: 29% center; }
+  .wedding-site .hero-image { top: -60px !important; height: calc(100% + 80px) !important; object-position: center center; }
   .wedding-site .hero-shade { background: linear-gradient(0deg, #092733f5 0%, #092733c2 34%, #09273327 73%, #09273338 100%); }
   .wedding-site .site-nav { height: 70px; padding: 0 25px; }
   .wedding-site .nav-links { display: none; }
