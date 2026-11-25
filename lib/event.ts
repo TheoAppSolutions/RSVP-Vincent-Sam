@@ -6,10 +6,10 @@ const timeZone = "Asia/Manila";
 const formatDate = (options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("en-US", { timeZone, ...options }).format(eventDate);
 
 export const EVENT = {
-  honoree: "Vincent & Krystel",
+  honoree: "Vincent & Sam",
   groom: "Vincent",
-  bride: "Krystel",
-  initials: "V & K",
+  bride: "Sam",
+  initials: "V & S",
   dateLong: formatDate({ weekday: "long", month: "long", day: "numeric", year: "numeric" }),
   dateLabel: formatDate({ month: "long", day: "numeric", year: "numeric" }),
   time: formatDate({ hour: "numeric", minute: "2-digit", hour12: true }),

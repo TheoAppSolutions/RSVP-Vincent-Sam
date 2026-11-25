@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     }
     const limited = await rateLimit(req, "rsvp");
     if (limited) return limited;
-    const { error } = await getSupabase().from("vincent_krystel").insert({
+    const { error } = await getSupabase().from("vincent_sam").insert({
       name, message, attending: body.attending,
     });
     if (error) throw error;

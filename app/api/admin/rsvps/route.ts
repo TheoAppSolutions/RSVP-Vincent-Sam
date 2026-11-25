@@ -11,7 +11,7 @@ export async function GET(req: Request) {
     const pageSize = 500;
     // Fetch only the fields used by the dashboard and exports.
     for (let offset = 0; ; offset += pageSize) {
-      const { data, error } = await getSupabase().from("vincent_krystel")
+      const { data, error } = await getSupabase().from("vincent_sam")
         .select("id,name,message,attending,created_at")
         .order("created_at", { ascending: false }).order("id", { ascending: false })
         .range(offset, offset + pageSize - 1);
@@ -31,7 +31,7 @@ export async function DELETE(req: Request) {
     if (!isRecord(body) || typeof body.id !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(body.id)) {
       throw new HttpError(400, "Invalid RSVP id");
     }
-    const { data, error } = await getSupabase().from("vincent_krystel").delete().eq("id", body.id).select("id").maybeSingle();
+    const { data, error } = await getSupabase().from("vincent_sam").delete().eq("id", body.id).select("id").maybeSingle();
     if (error) throw error;
     if (!data) return json({ error: "RSVP not found" }, 404);
     return json({ ok: true });

@@ -6,14 +6,14 @@ The root page displays the wedding invitation and RSVP form. The admin dashboard
 
 1. Run `npm install`.
 2. Copy `.env.example` to `.env.local` and set the Supabase URL, service role key, and a strong, unique admin password. The placeholder `change-me` is rejected.
-3. For a new database, run `supabase/schema.sql` in the Supabase SQL editor. Existing databases with `public.vincent_krystel` need no migration.
+3. Run `supabase/schema.sql` in the Supabase SQL editor to create or migrate the RSVP table.
 4. Run `npm run dev`.
 
-Open `/` for the invitation and `/admin` for guest responses. The RSVP form writes to the Supabase table `public.vincent_krystel`. The dashboard can filter, export, and delete responses.
+Open `/` for the invitation and `/admin` for guest responses. The RSVP form writes to the Supabase table `public.vincent_sam`. The dashboard can filter, export, and delete responses.
 
 ## Updating an existing deployment
 
-No database migration is required for the existing `public.vincent_krystel` table. The app uses only `id`, `name`, `message`, `attending`, and `created_at`; the database generates `id` and `created_at`. Keep the database row limit at least 500 (the admin fetches pages of 500).
+Run `supabase/schema.sql` in the Supabase SQL editor when deploying this version. It renames the existing `public.vincent_krystel` or `public.rsvp` table to `public.vincent_sam`, preserving responses. If more than one of those tables exists, the migration stops so the data can be reconciled manually. Coordinate the migration and deployment: the previous app expects the old table name and this version expects the new one, so RSVP and admin requests may be unavailable between the two steps. The app uses only `id`, `name`, `message`, `attending`, and `created_at`; the database generates `id` and `created_at`. Keep the database row limit at least 500 (the admin fetches pages of 500).
 
 Admin login now creates an eight-hour, HttpOnly, SameSite=Strict cookie. Production cookies are Secure and require HTTPS. Sign out clears the cookie; rotating `ADMIN_PASSWORD` or the signing secret invalidates all existing sessions. `ADMIN_SESSION_SECRET` can be a dedicated random secret (generate with `openssl rand -hex 32`); otherwise the server-only Supabase service role key is used. Passwords previously saved in browser session storage are removed on the next admin visit. The old `x-admin-password` API header is no longer accepted.
 
