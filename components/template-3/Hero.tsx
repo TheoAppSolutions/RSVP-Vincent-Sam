@@ -37,9 +37,14 @@ export default function Hero() {
       {entered && (
         <nav className="site-nav" aria-label="Main navigation">
           <div className="nav-links">
+            <a href="#countdown">Countdown</a>
             <a href="#venues">The day</a>
             <a href="#gallery">Our story</a>
+            <a href="#attire">Attire</a>
             <a href="#details">Details</a>
+            <a href="#gift">Gifts</a>
+            <a href="#entourage">Entourage</a>
+            <a href="#rsvp">RSVP</a>
           </div>
         </nav>
       )}

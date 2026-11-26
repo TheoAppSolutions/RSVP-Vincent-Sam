@@ -38,7 +38,7 @@ html { scroll-behavior: smooth; }
 .wedding-site .hero-image { object-fit: cover; object-position: 40% 45%; }
 .wedding-site .hero-shade { position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, #00000008 15%, #00000045 48%, #000000a6 100%), linear-gradient(0deg, #00000080, transparent 58%); pointer-events: none; }
 .wedding-site .site-nav { position: relative; z-index: 2; display: flex; justify-content: center; align-items: center; width: 100%; height: 80px; border-bottom: 1px solid #ffffff4a; padding: 0 max(48px, calc((100vw - 1320px) / 2)); background: #122c3933; backdrop-filter: blur(4px); }
-.wedding-site .nav-links { display: flex; align-items: center; gap: 40px; }
+.wedding-site .nav-links { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 14px 32px; }
 .wedding-site .nav-links a { font-size: 10px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; }
 .wedding-site .nav-links a { color: #fff; transition: color .2s; }
 .wedding-site .nav-links a:hover { color: #e4cba4; }
@@ -214,8 +214,8 @@ html { scroll-behavior: smooth; }
   .wedding-site .hero { min-height: 0; }
   .wedding-site .hero-image { top: -60px !important; height: calc(100% + 80px) !important; object-position: center center; }
   .wedding-site .hero-shade { background: linear-gradient(0deg, #000000cc 0%, #00000099 34%, #0000001a 73%, #00000024 100%); }
-  .wedding-site .site-nav { height: 70px; padding: 0 25px; }
-  .wedding-site .nav-links { gap: 24px; }
+  .wedding-site .site-nav { height: auto; min-height: 70px; padding: 18px 25px; }
+  .wedding-site .nav-links { gap: 14px 20px; }
   .wedding-site .hero-content { align-items: flex-end; justify-content: flex-start; padding: clamp(42px, 15svh, 165px) 28px 20px; }
   .wedding-site .hero-copy { display: block; width: min(100%, 550px); border-left: 0; border-top: 1px solid #ddc5a0; padding: 23px 0 0; }
   .wedding-site .hero-title-group, .wedding-site .hero-details { display: block; }
