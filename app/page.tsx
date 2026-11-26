@@ -6,6 +6,7 @@ import Gift from "@/components/template-3/Gift";
 import GoodToKnow from "@/components/template-3/GoodToKnow";
 import Gallery from "@/components/template-3/Gallery";
 import RsvpForm from "@/components/template-3/RsvpForm";
+import Entourage from "@/components/template-3/Entourage";
 import DesignShell from "@/components/template-3/MusicPlayer";
 import { EVENT } from "@/lib/event";
 import Image from "next/image";
@@ -22,6 +23,7 @@ export default function Home() {
         <Attire />
         <GoodToKnow />
         <Gift />
+        <Entourage />
         <section id="rsvp" className="rsvp-section" aria-labelledby="rsvp-title">
           <div className="rsvp-section-inner">
             <div className="rsvp-intro">
