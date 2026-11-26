@@ -8,6 +8,8 @@ import Gallery from "@/components/template-3/Gallery";
 import RsvpForm from "@/components/template-3/RsvpForm";
 import DesignShell from "@/components/template-3/MusicPlayer";
 import { EVENT } from "@/lib/event";
+import Image from "next/image";
+import weddingIcon from "./icon.png";
 
 export default function Home() {
   return (
@@ -26,13 +28,12 @@ export default function Home() {
               <span className="eyebrow light">The celebration is better with you</span>
               <h2 id="rsvp-title" className="display-heading">The pleasure of your <em>company</em></h2>
               <p>We would be honored to celebrate this day with you. Kindly reply by {EVENT.rsvpDeadline}.</p>
-              <div className="rsvp-monogram" aria-hidden="true">{EVENT.initials}</div>
             </div>
             <RsvpForm />
           </div>
         </section>
         <footer className="site-footer">
-          <div className="footer-mark">{EVENT.initials}</div>
+          <Image className="footer-mark" src={weddingIcon} alt={`${EVENT.honoree} monogram`} width={80} height={80} />
           <p>{EVENT.dateLabel} <span aria-hidden="true">·</span> {EVENT.venue.name}</p>
           <p>Made with love, for the people we love.</p>
           <a href="#top">Back to top ↑</a>

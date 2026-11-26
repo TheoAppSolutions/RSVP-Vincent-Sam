@@ -34,15 +34,15 @@ export default function Hero() {
       <Image src={MEDIA.hero} alt={`${EVENT.honoree} embracing outdoors`} fill priority quality={90} sizes="100vw" className="hero-image" />
       <div className="hero-shade" aria-hidden="true" />
 
-      <nav className="site-nav" aria-label="Main navigation">
-        <a href="#top" className="nav-brand" aria-label={`${EVENT.honoree}, top of page`}>{EVENT.initials}</a>
-        <div className="nav-links">
-          <a href="#venues" tabIndex={entered ? 0 : -1}>The day</a>
-          <a href="#gallery" tabIndex={entered ? 0 : -1}>Our story</a>
-          <a href="#details" tabIndex={entered ? 0 : -1}>Details</a>
-        </div>
-        <button type="button" onClick={goToRsvp} className="nav-rsvp">RSVP <span aria-hidden="true">↗</span></button>
-      </nav>
+      {entered && (
+        <nav className="site-nav" aria-label="Main navigation">
+          <div className="nav-links">
+            <a href="#venues">The day</a>
+            <a href="#gallery">Our story</a>
+            <a href="#details">Details</a>
+          </div>
+        </nav>
+      )}
 
       <div className="hero-content">
         <div className="hero-copy">
@@ -59,7 +59,7 @@ export default function Hero() {
               <span>{EVENT.dateLong}</span>
               <span>{EVENT.time} · {EVENT.venue.name}, {EVENT.venue.address}</span>
             </div>
-            <button type="button" onClick={goToRsvp} className="primary-link">Kindly RSVP <span aria-hidden="true">↗</span></button>
+            {entered && <button type="button" onClick={goToRsvp} className="primary-link">Kindly RSVP <span aria-hidden="true">↗</span></button>}
           </div>
         </div>
       </div>
